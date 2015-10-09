@@ -51,6 +51,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CommandFilter.cs" />
+    <Compile Include="Core\IMarginCore.cs" />
+    <Compile Include="Core\MarginCore.cs" />
+    <Compile Include="DiffMarginBase.cs" />
+    <Compile Include="DiffMarginFactoryBase.cs" />
+    <Compile Include="EditorDiffMargin.cs" />
+    <Compile Include="EditorDiffMarginFactory.cs" />
+    <Compile Include="GitDiffMarginCommand.cs" />
+    <Compile Include="GitDiffMarginCommandHandler.cs" />
+    <Compile Include="GitDiffMarginTextViewOptions.cs" />
+    <Compile Include="Git\DiffFormatNames.cs" />
     <Compile Include="Git\DiffParser.cs" />
     <Compile Include="Git\GitDiffParser.cs" />
     <Compile Include="Git\HunkRange.cs" />
@@ -60,6 +71,26 @@
     <Compile Include="PullRequestFilterCommand.cs" />
     <Compile Include="PullRequestFilterCommandPackage.cs" />
     <Compile Include="PullRequestFilterPackageGuids.cs" />
+    <Compile Include="ScrollDiffMargin.cs" />
+    <Compile Include="ScrollDiffMarginFactory2013.cs" />
+    <Compile Include="Settings\CompareToIndex.cs" />
+    <Compile Include="Settings\DiffAdditionEditorFormatDefinition.cs" />
+    <Compile Include="Settings\DiffMarginEnabled.cs" />
+    <Compile Include="Settings\DiffModificationEditorFormatDefinition.cs" />
+    <Compile Include="Settings\DiffRemovedEditorFormatDefinition.cs" />
+    <Compile Include="TextViewCommandFilter.cs" />
+    <Compile Include="ViewModel\DiffMarginViewModelBase.cs" />
+    <Compile Include="ViewModel\DiffViewModel.cs" />
+    <Compile Include="ViewModel\EditorDiffMarginViewModel.cs" />
+    <Compile Include="ViewModel\EditorDiffViewModel.cs" />
+    <Compile Include="ViewModel\ScrollDiffMarginViewModel.cs" />
+    <Compile Include="ViewModel\ScrollDiffViewModel.cs" />
+    <Compile Include="View\EditorDiffMarginControl.xaml.cs">
+      <DependentUpon>EditorDiffMarginControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ScrollDiffMarginControl.xaml.cs">
+      <DependentUpon>ScrollDiffMarginControl.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
@@ -91,18 +122,45 @@
     <Reference Include="EnvDTE90, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="GalaSoft.MvvmLight, Version=5.2.0.37222, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.2.0.37222, Culture=neutral, PublicKeyToken=669f0b5e8f868abf, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\GalaSoft.MvvmLight.Extras.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.2.0.37226, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\VSSDK.CoreUtility.12.0.4\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Editor, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\VSSDK.Editor.12.0.4\lib\net45\Microsoft.VisualStudio.Editor.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Imaging.14.0.23107\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6070\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+      <HintPath>..\packages\VSSDK.OLE.Interop.7.0.4\lib\net20\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
       <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Shell.14.0.14.0.23107\lib\Microsoft.VisualStudio.Shell.14.0.dll</HintPath>
@@ -125,8 +183,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.VisualStudio.Shell.Interop.7.10.6071\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
+      <HintPath>..\packages\VSSDK.Shell.Interop.7.0.4\lib\net20\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
       <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -151,13 +210,35 @@
       <HintPath>..\packages\Microsoft.VisualStudio.Shell.Interop.9.0.9.0.30729\lib\Microsoft.VisualStudio.Shell.Interop.9.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.VisualStudio.TextManager.Interop.7.10.6070\lib\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
+    <Reference Include="Microsoft.VisualStudio.Text.Data, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.Data.dll</HintPath>
       <Private>True</Private>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.Logic.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.UI, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.UI.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.UI.Wpf.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\packages\VSSDK.TextManager.Interop.7.0.4\lib\net20\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.VisualStudio.TextManager.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
+      <HintPath>..\packages\VSSDK.TextManager.Interop.8.8.0.4\lib\net20\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
       <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Threading, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Threading.14.0.50702\lib\net45\Microsoft.VisualStudio.Threading.dll</HintPath>
@@ -171,6 +252,8 @@
       <HintPath>..\packages\Microsoft.VisualStudio.Validation.14.0.50702\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
@@ -180,13 +263,29 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="View\EditorDiffMarginControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ScrollDiffMarginControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

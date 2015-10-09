@@ -11,10 +11,12 @@ using PReview.Git;
 namespace PReview
 {
     [SolutionTreeFilterProvider(PullRequestFilterPackageGuids.guidPullRequestFilterPackageCmdSetString, PullRequestFilterPackageGuids.PullRequestFilterId)]
+    [Export]
     public class PullRequestFilterProvider : HierarchyTreeFilterProvider
     {
         private readonly IVsHierarchyItemCollectionProvider _hierarchyCollectionProvider;
         private readonly SVsServiceProvider _svcProvider;
+        public Dictionary<string, UnifiedDiff> UnifiedDiffs = new Dictionary<string, UnifiedDiff>();
 
         [ImportingConstructor]
         public PullRequestFilterProvider(SVsServiceProvider serviceProvider, IVsHierarchyItemCollectionProvider hierarchyCollectionProvider)
@@ -25,18 +27,19 @@ namespace PReview
 
         protected override HierarchyTreeFilter CreateFilter()
         {
-            return new PullRequestFilter(_svcProvider, _hierarchyCollectionProvider);
+            return new PullRequestFilter(_svcProvider, _hierarchyCollectionProvider, this);
         }
 
         private sealed class PullRequestFilter : HierarchyTreeFilter
         {
             private readonly IVsHierarchyItemCollectionProvider _hierarchyCollectionProvider;
+            private readonly PullRequestFilterProvider _pullRequestFilterProvider;
             private readonly DiffParser _diffParser;
-            private Dictionary<string, UnifiedDiff> _parseResult;
 
-            public PullRequestFilter(IServiceProvider serviceProvider, IVsHierarchyItemCollectionProvider hierarchyCollectionProvider)
+            public PullRequestFilter(IServiceProvider serviceProvider, IVsHierarchyItemCollectionProvider hierarchyCollectionProvider, PullRequestFilterProvider pullRequestFilterProvider)
             {
                 _hierarchyCollectionProvider = hierarchyCollectionProvider;
+                _pullRequestFilterProvider = pullRequestFilterProvider;
 
                 var dte = (DTE)serviceProvider.GetService(typeof(DTE));
                 var solutionDir = Path.GetDirectoryName(dte.Solution.FullName);
@@ -52,7 +55,9 @@ namespace PReview
                 var root = HierarchyUtilities.FindCommonAncestor(rootItems);
                 var sourceItems = await _hierarchyCollectionProvider.GetDescendantsAsync(root.HierarchyIdentity.NestedHierarchy, CancellationToken);
 
-                _parseResult = await _diffParser.ParseAsync();
+                //_pullRequestFilterProvider.UnifiedDiffs.Clear();
+
+                _pullRequestFilterProvider.UnifiedDiffs = await _diffParser.ParseAsync();
 
                 return await _hierarchyCollectionProvider.GetFilteredHierarchyItemsAsync(sourceItems, ShouldIncludeInFilter, CancellationToken);
             }
@@ -63,7 +68,7 @@ namespace PReview
                 if (hierarchyItem?.CanonicalName == null) return false;
 
                 UnifiedDiff diff;
-                return _parseResult.TryGetValue(hierarchyItem.CanonicalName, out diff);
+                return _pullRequestFilterProvider.UnifiedDiffs.TryGetValue(hierarchyItem.CanonicalName, out diff);
             }
         }
     }

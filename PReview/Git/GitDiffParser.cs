@@ -14,7 +14,7 @@ namespace PReview.Git
         {
         }
 
-        public UnifiedDiffParser(int contextLines, bool suppressRollback)
+        private UnifiedDiffParser(int contextLines, bool suppressRollback)
         {
             _contextLines = contextLines;
             _suppressRollback = suppressRollback;
@@ -27,11 +27,8 @@ namespace PReview.Git
                    select new HunkRangeInfo(new HunkRange(GetHunkOriginalFile(hunkLine.Item1), _contextLines), new HunkRange(GetHunkNewFile(hunkLine.Item1), _contextLines), hunkLine.Item2, _suppressRollback);
         }
 
-        public IEnumerable<Tuple<string, IEnumerable<string>>> GetUnifiedFormatHunkLines(List<string> gitDiffLines)
+        private IEnumerable<Tuple<string, IEnumerable<string>>> GetUnifiedFormatHunkLines(List<string> gitDiffLines)
         {
-            //var split = gitDiff.Split('\n');
-            //var split = _gitDiff.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
-
             var withoutHeader = gitDiffLines.SkipWhile(s => !s.StartsWith("@@")).ToList();
 
             var splitHunks = SplitHunks(withoutHeader).ToList();

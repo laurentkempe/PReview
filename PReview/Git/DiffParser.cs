@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace PReview
             var unifiedDiffs = new List<UnifiedDiff>();
             var lines = new List<string>();
 
-            var unifiedDiffParser = new UnifiedDiffParser(0);
+            var unifiedDiffParser = new UnifiedDiffParser(3);
 
             using (var reader = File.OpenText(_diffFilePath))
             {
