@@ -1,0 +1,25 @@
+# NuGet files managed during the build
+/packages/
+
+# Build output
+bin/
+obj/
+
+# Testing, performance, and code coverage analysis
+[Tt]est[Rr]esult*/
+
+# Roslyn IntelliSense Cache
+*.sln.ide/
+
+# User-specific files
+*.suo
+*.user
+
+# Ignore operating system litter
+Thumbs.db
+
+# Exclusions for other IDE extensions 
+_ReSharper*/
+*.dotcover
+*.ncrunchproject
+*.ncrunchsolution
