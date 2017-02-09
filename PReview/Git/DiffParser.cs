@@ -3,18 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using PReview.Git;
+using System.Net;
+using System;
 
 namespace PReview
 {
     public class DiffParser
     {
-        private readonly string _diffFilePath;
         private readonly string _solutionDir;
 
         public DiffParser(string solutionDir)
         {
             _solutionDir = solutionDir;
-            _diffFilePath = Path.Combine(_solutionDir, "diff.txt");
         }
 
         public async Task<Dictionary<string, UnifiedDiff>> ParseAsync()
@@ -24,37 +24,60 @@ namespace PReview
 
             var unifiedDiffParser = new UnifiedDiffParser(3);
 
-            using (var reader = File.OpenText(_diffFilePath))
+            var reader = FindPatchReader(_solutionDir);
+            if(reader != null)
             {
-                var n = 0;
-
-                string line;
-                while ((line = await reader.ReadLineAsync()) != null)
+                using (reader)
                 {
-                    if (line.StartsWith("diff --git"))
+                    var n = 0;
+
+                    string line;
+                    while ((line = await reader.ReadLineAsync()) != null)
                     {
-                        var unifiedDiff = new UnifiedDiff(line);
-                        if (n > 0)
+                        if (line.StartsWith("diff --git"))
                         {
-                            unifiedDiffs[unifiedDiffs.Count - 1].HunkRanges.AddRange(unifiedDiffParser.Parse(lines));
+                            var unifiedDiff = new UnifiedDiff(line);
+                            if (n > 0)
+                            {
+                                unifiedDiffs[unifiedDiffs.Count - 1].HunkRanges.AddRange(unifiedDiffParser.Parse(lines));
+                            }
+
+                            n++;
+
+                            unifiedDiffs.Add(unifiedDiff);
+
+                            lines.Clear();
+
+                            lines.Add(line);
                         }
-
-                        n++;
-
-                        unifiedDiffs.Add(unifiedDiff);
-
-                        lines.Clear();
-
-                        lines.Add(line);
-                    }
-                    else
-                    {
-                        lines.Add(line);
+                        else
+                        {
+                            lines.Add(line);
+                        }
                     }
                 }
             }
 
             return unifiedDiffs.ToDictionary(diff => _solutionDir.ToLower() + "\\" + diff.NewFile.Replace("/", "\\").ToLower());
+        }
+
+        private static TextReader FindPatchReader(string solutionDir)
+        {
+            var diffUrl = (string)AppDomain.CurrentDomain.GetData("PReview.diff.url");
+            if (diffUrl != null)
+            {
+                var webClient = new WebClient();
+                var stream = webClient.OpenRead(diffUrl);
+                return new StreamReader(stream);
+            }
+
+            var patchFile = Path.Combine(solutionDir, "diff.txt");
+            if (File.Exists(patchFile))
+            {
+                return File.OpenText(patchFile);
+            }
+
+            return null;
         }
     }
 
