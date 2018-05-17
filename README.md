@@ -1,6 +1,8 @@
 # PReview (Early Alpha) [![Build status](https://ci.appveyor.com/api/projects/status/i64qudc1fn0jwoop?svg=true)](https://ci.appveyor.com/project/laurentkempe/preview)
 PReview facilitates GitHub Pull Request reviews from within Visual Studio 2015.
 
+!!! This is will be integrated in GitHub Extension for Visual Studio, [see here](https://github.com/github/VisualStudio/pull/1667) !!!
+
 * Filter Visual Studio Solution Explorer using GitHub Pull Request diff file
 * Show file differences in the margin
 
